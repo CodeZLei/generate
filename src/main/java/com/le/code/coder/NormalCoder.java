@@ -1,5 +1,6 @@
 package com.le.code.coder;
 
+import java.awt.dnd.DropTarget;
 import java.io.File;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
@@ -36,6 +37,7 @@ public class NormalCoder {
 	private String templateFilePath;
 	private String desFilePath;
 	private String dateStr;
+	private String tableNameStr;
 	/** freemarker 的配置 **/
 	private Configuration cfg;
 	/** 项目的基础包结构 **/
@@ -46,6 +48,8 @@ public class NormalCoder {
 	private Map<String, String> templateFileTypeMap;
 	/** 数据集合 **/
 	private List<Map<String, Object>> dataList;
+	/** 表的名字的集合 */
+	private List<String> tableNameList;
 
 	private StringBuilder warnMsg;
 
@@ -77,6 +81,7 @@ public class NormalCoder {
 		warnMsg = new StringBuilder();
 
 		// 加载并检查文件路径
+		tableNameStr = PropertiesUtils.getString("generate.table.name");
 		templateFilePath = PropertiesUtils.getString("path.normalTemplate");
 		basePachage = PropertiesUtils.getString("bathPackage.normalTemplate");
 		desFilePath = PropertiesUtils.getString("path.destFile");
@@ -90,11 +95,23 @@ public class NormalCoder {
 		// 时间
 		dateStr = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
 
+
+		//初始化表的名字
+		tableNameList = new ArrayList<>();
+		JSONObject tableNameObject = JSON.parseObject(tableNameStr);
+		JSONArray tableNames = tableNameObject.getJSONArray("tableName");
+		for (Object tableName : tableNames) {
+			tableNameList.add(tableName.toString());
+		}
+
+
 		// 初始化dataList
 		dataList = new ArrayList<Map<String, Object>>();
 		List<Table> tableList = parser.parse();
 		for (Table table : tableList) {
-			dataList.add(getDataMap(table));
+			if(tableNameList.contains(table.getTableCode())){
+				dataList.add(getDataMap(table));
+			}
 		}
 
 		// 读取模板配置

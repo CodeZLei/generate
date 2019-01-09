@@ -34,6 +34,7 @@ public class ${beanName} implements Serializable{
     public ${column.javaType} get${column.propertyName?cap_first}(){
         return ${column.propertyName};
     }
+
     public void set${column.propertyName?cap_first}(${column.javaType} ${column.propertyName}){
         this.${column.propertyName} = ${column.propertyName};
     }
